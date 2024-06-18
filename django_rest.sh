@@ -48,6 +48,24 @@ read -p "Enter Django app name: " app_name
 echo "Creating Django app '$app_name'..."
 django-admin startapp $app_name
 
+# Create urls.py file inside the app
+echo "Creating urls.py file inside the app..."
+touch $app_name/urls.py
+
+# Add app's URLs to the main project's urls.py
+echo "Adding app's URLs to the main project's urls.py..."
+echo -e "\nfrom django.urls import path, include" >> $project_name/$project_name/urls.py
+echo -e "urlpatterns = [\n    path('', include('$app_name.urls')),\n]" >> $project_name/$project_name/urls.py
+
+
+# Add the endpoint to the app's urls.py
+echo "Adding endpoint to the app's urls.py..."
+echo -e "from django.urls import path\nfrom .views import HelloWorld\n\nurlpatterns = [\n    path('hello/', HelloWorld.as_view(), name='hello_world'),\n]" > $app_name/urls.py
+
+# Add the view to the app's views.py
+echo "Adding view to the app's views.py..."
+echo -e "from rest_framework.views import APIView\nfrom rest_framework.response import Response\nfrom rest_framework import status\n\nclass HelloWorld(APIView):\n    def get(self, request):\n        return Response({\"message\": \"Hello, world!\"}, status=status.HTTP_200_OK)" > $app_name/views.py
+
 # Move the app and the virtual environment inside the Django project directory
 echo "Moving the app and the virtual environment inside the Django project directory..."
 mv $app_name $project_name
